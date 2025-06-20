@@ -13,7 +13,15 @@ import os
 from datetime import datetime
 from pathlib import Path
 
-app = Flask(__name__)
+# Get absolute paths
+BASE_DIR = Path(__file__).parent
+TEMPLATE_DIR = str(BASE_DIR / 'templates')
+STATIC_DIR = str(BASE_DIR / 'static')
+
+app = Flask(__name__,
+           template_folder=TEMPLATE_DIR,
+           static_folder=STATIC_DIR,
+           static_url_path='/static')
 CORS(app)
 moment = Moment(app)
 

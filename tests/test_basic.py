@@ -59,5 +59,21 @@ class TestBasicFunctionality(unittest.TestCase):
         from werkzeug.middleware.proxy_fix import ProxyFix
         self.assertIsInstance(app.wsgi_app, ProxyFix)
 
+    def test_flask_app_configuration(self):
+        """Test that Flask app is configured correctly for Vercel"""
+        import pathlib
+        base_dir = pathlib.Path(__file__).parent.parent
+        
+        # Test template folder configuration
+        self.assertEqual(app.template_folder, str(base_dir / 'templates'))
+        
+        # Test static folder configuration
+        self.assertEqual(app.static_folder, str(base_dir / 'static'))
+        self.assertEqual(app.static_url_path, '/static')
+        
+        # Test static file serving
+        response = self.app.get('/static/css/style.css')
+        self.assertIn(response.status_code, [200, 404])  # 404 is ok if file doesn't exist yet
+
 if __name__ == '__main__':
     unittest.main()

@@ -8,9 +8,17 @@ import json
 import os
 from datetime import datetime
 
-app = Flask(__name__, 
-                template_folder='../templates',
-                static_folder='../static')
+import pathlib
+
+# Get absolute paths
+BASE_DIR = pathlib.Path(__file__).parent.parent
+TEMPLATE_DIR = str(BASE_DIR / 'templates')
+STATIC_DIR = str(BASE_DIR / 'static')
+
+app = Flask(__name__,
+           template_folder=TEMPLATE_DIR,
+           static_folder=STATIC_DIR,
+           static_url_path='/static')
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
