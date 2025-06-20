@@ -9,15 +9,23 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+import pathlib
+
+# Get absolute paths for better compatibility
+BASE_DIR = pathlib.Path(__file__).parent.parent
+TEMPLATE_DIR = str(BASE_DIR / 'templates')
+STATIC_DIR = str(BASE_DIR / 'static')
 
 # Initialize Flask app with proper paths for Vercel
-app = Flask(__name__, 
-            template_folder='../templates',
-            static_folder='../static')
+app = Flask(__name__,
+           template_folder=TEMPLATE_DIR,
+           static_folder=STATIC_DIR,
+           static_url_path='/static')
 CORS(app)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Sample data for demo
 COUNTRIES_DATA = [
@@ -54,170 +62,222 @@ KENYA_STRATEGY = {
     "strategic_pillars": [
         {
             "name": "AI Infrastructure and Ecosystem",
-            "description": "Develop robust digital infrastructure and supportive ecosystem for AI",
-            "key_actions": [
-                "Expand broadband connectivity nationwide",
-                "Establish AI research centers",
-                "Create AI innovation hubs",
-                "Develop data governance frameworks"
+            "description": "Building robust digital infrastructure and creating an enabling environment for AI development",
+            "key_initiatives": [
+                "National AI Research Institute",
+                "AI Innovation Hubs",
+                "Digital Infrastructure Development",
+                "Public-Private Partnerships"
             ]
         },
         {
             "name": "Human Capital Development",
-            "description": "Build AI skills and capabilities across all sectors",
-            "key_actions": [
-                "Integrate AI in education curriculum",
-                "Establish AI training programs",
-                "Support AI research and development",
-                "Create AI certification programs"
+            "description": "Developing AI skills and capabilities across all sectors of society",
+            "key_initiatives": [
+                "AI Education Curriculum",
+                "Professional Training Programs",
+                "Research Scholarships",
+                "Industry-Academia Collaboration"
+            ]
+        },
+        {
+            "name": "AI for Development",
+            "description": "Leveraging AI to address development challenges and improve service delivery",
+            "key_initiatives": [
+                "AI in Healthcare",
+                "Smart Agriculture Solutions",
+                "Digital Government Services",
+                "Financial Inclusion"
+            ]
+        },
+        {
+            "name": "Ethics and Governance",
+            "description": "Ensuring responsible AI development and deployment",
+            "key_initiatives": [
+                "AI Ethics Framework",
+                "Regulatory Sandbox",
+                "Data Protection Measures",
+                "Algorithmic Accountability"
             ]
         }
     ],
-    "priority_sectors": [
-        {
-            "name": "Agriculture",
-            "ai_applications": ["Precision farming", "Crop monitoring", "Market intelligence"],
-            "expected_impact": "Increase agricultural productivity by 30%"
-        },
-        {
-            "name": "Healthcare",
-            "ai_applications": ["Medical diagnosis", "Drug discovery", "Telemedicine"],
-            "expected_impact": "Improve healthcare access and quality"
-        }
+    "key_sectors": [
+        "Healthcare", "Agriculture", "Education", "Financial Services", 
+        "Manufacturing", "Transportation", "Energy", "Government"
     ],
-    "key_initiatives": [
-        {
-            "name": "Kenya AI Innovation Hub",
-            "description": "Establish world-class AI research and innovation center",
-            "budget": "USD 50 million",
-            "timeline": {"start": "2022", "end": "2025"},
-            "expected_outcomes": ["100 AI startups incubated", "500 AI researchers trained"]
-        }
-    ],
-    "funding_strategy": {
-        "total_budget": "USD 200 million over 5 years"
+    "timeline": {
+        "2022": "Strategy Launch and Foundation Setting",
+        "2023": "Infrastructure Development and Pilot Programs",
+        "2024": "Scaling and Implementation",
+        "2025": "Expansion and Integration",
+        "2026": "Optimization and Enhancement",
+        "2027": "Evaluation and Next Phase Planning"
     }
 }
 
 @app.route('/')
 def index():
     """Main dashboard page"""
-    countries = COUNTRIES_DATA
-    stats = {
-        'total_countries': len(countries),
-        'total_strategies': len([c for c in countries if c['status'] == 'published']),
-        'last_updated': datetime.now().strftime('%Y-%m-%d')
-    }
-    return render_template('index.html', countries=countries, stats=stats)
-
-@app.route('/country/<country_code>')
-def country_detail(country_code):
-    """Individual country strategy page"""
-    if country_code == 'KE':
-        return render_template('country.html', country=KENYA_STRATEGY)
-    else:
-        return render_template('404.html'), 404
+    return render_template('index.html', 
+                         countries=COUNTRIES_DATA, 
+                         themes=THEMES_DATA)
 
 @app.route('/api/countries')
 def api_countries():
-    """API endpoint for countries list"""
+    """API endpoint for countries data"""
     return jsonify(COUNTRIES_DATA)
-
-@app.route('/api/country/<country_code>/strategy')
-def api_country_strategy(country_code):
-    """API endpoint for country strategy data"""
-    if country_code == 'KE':
-        return jsonify(KENYA_STRATEGY)
-    return jsonify({'error': 'Country not found'}), 404
-
-@app.route('/api/cross-cutting')
-def api_cross_cutting():
-    """API endpoint for cross-cutting analysis"""
-    analysis = {
-        "analysis_date": datetime.now().isoformat(),
-        "countries_analyzed": [c["code"] for c in COUNTRIES_DATA],
-        "total_themes": len(THEMES_DATA),
-        "theme_analysis": {theme["name"]: {
-            "countries": theme["countries"],
-            "frequency": theme["frequency"],
-            "percentage": theme["percentage"],
-            "related_themes": [],
-            "key_initiatives": [],
-            "common_approaches": []
-        } for theme in THEMES_DATA},
-        "insights": [
-            "Skills Development is the most universal theme across all African AI strategies",
-            "Innovation and Infrastructure are prioritized by 75%+ of countries",
-            "Agriculture remains a key focus area for most African nations"
-        ],
-        "collaboration_opportunities": [
-            {
-                "theme": "Skills Development",
-                "countries": ["KE", "NG", "ZA", "EG", "MA", "GH", "RW", "TN"],
-                "collaboration_type": "Joint training programs and certification",
-                "potential_impact": "High"
-            }
-        ]
-    }
-    return jsonify(analysis)
-
-@app.route('/api/mind-map/<country_code>')
-def api_mind_map(country_code):
-    """API endpoint for mind map data"""
-    if country_code == 'KE':
-        mind_map_data = {
-            "name": "Kenya AI Strategy",
-            "type": "root",
-            "children": [
-                {
-                    "name": "Strategic Pillars",
-                    "type": "category",
-                    "children": [
-                        {"name": "AI Infrastructure", "type": "pillar", "size": 3},
-                        {"name": "Human Capital", "type": "pillar", "size": 3},
-                        {"name": "Innovation", "type": "pillar", "size": 3},
-                        {"name": "Ethics & Governance", "type": "pillar", "size": 3}
-                    ]
-                },
-                {
-                    "name": "Priority Sectors",
-                    "type": "category",
-                    "children": [
-                        {"name": "Agriculture", "type": "sector", "size": 2},
-                        {"name": "Healthcare", "type": "sector", "size": 2},
-                        {"name": "Education", "type": "sector", "size": 2},
-                        {"name": "Financial Services", "type": "sector", "size": 2}
-                    ]
-                }
-            ]
-        }
-        return jsonify(mind_map_data)
-    return jsonify({'error': 'Country not found'}), 404
 
 @app.route('/api/themes')
 def api_themes():
-    """API endpoint for all themes"""
+    """API endpoint for themes data"""
     return jsonify(THEMES_DATA)
+
+@app.route('/api/country/<country_code>')
+def api_country_detail(country_code):
+    """API endpoint for specific country data"""
+    if country_code.upper() == 'KE':
+        return jsonify(KENYA_STRATEGY)
+    else:
+        # Return basic info for other countries
+        country = next((c for c in COUNTRIES_DATA if c['code'] == country_code.upper()), None)
+        if country:
+            return jsonify({
+                "country_code": country['code'],
+                "country_name": country['name'],
+                "status": country['status'],
+                "message": "Detailed strategy data coming soon!"
+            })
+        else:
+            return jsonify({"error": "Country not found"}), 404
+
+@app.route('/country/<country_code>')
+def country_detail(country_code):
+    """Country detail page"""
+    if country_code.upper() == 'KE':
+        return render_template('country.html', strategy=KENYA_STRATEGY)
+    else:
+        country = next((c for c in COUNTRIES_DATA if c['code'] == country_code.upper()), None)
+        if country:
+            return render_template('country.html', 
+                                 strategy={
+                                     "country_code": country['code'],
+                                     "country_name": country['name'],
+                                     "status": country['status'],
+                                     "message": "Detailed strategy analysis coming soon!"
+                                 })
+        else:
+            return render_template('404.html'), 404
 
 @app.route('/compare')
 def compare():
     """Strategy comparison page"""
     return render_template('compare.html', countries=COUNTRIES_DATA)
 
-@app.route('/analysis')
-def analysis():
-    """Cross-cutting analysis page"""
-    return render_template('analysis.html', themes=THEMES_DATA)
+@app.route('/api/compare')
+def api_compare():
+    """API endpoint for comparison data"""
+    return jsonify({
+        "countries": COUNTRIES_DATA,
+        "themes": THEMES_DATA,
+        "comparison_matrix": {
+            "themes": [theme["name"] for theme in THEMES_DATA],
+            "countries": [country["code"] for country in COUNTRIES_DATA if country["status"] == "published"]
+        }
+    })
 
 @app.route('/search')
 def search():
     """Search page"""
     return render_template('search.html')
 
+@app.route('/api/search')
+def api_search():
+    """API endpoint for search functionality"""
+    query = request.args.get('q', '').lower()
+    results = []
+    
+    # Search in countries
+    for country in COUNTRIES_DATA:
+        if query in country['name'].lower():
+            results.append({
+                "type": "country",
+                "title": country['name'],
+                "url": f"/country/{country['code']}",
+                "description": f"AI Strategy - {country['status'].replace('_', ' ').title()}"
+            })
+    
+    # Search in themes
+    for theme in THEMES_DATA:
+        if query in theme['name'].lower():
+            results.append({
+                "type": "theme",
+                "title": theme['name'],
+                "url": f"/themes#{theme['name'].lower().replace(' ', '-')}",
+                "description": f"Found in {theme['frequency']} countries ({theme['percentage']:.1f}%)"
+            })
+    
+    return jsonify({"query": query, "results": results})
+
+@app.route('/analysis')
+def analysis():
+    """Analysis and insights page"""
+    return render_template('analysis.html', themes=THEMES_DATA)
+
+@app.route('/api/analysis')
+def api_analysis():
+    """API endpoint for analysis data"""
+    return jsonify({
+        "themes_analysis": THEMES_DATA,
+        "country_status": {
+            "published": len([c for c in COUNTRIES_DATA if c['status'] == 'published']),
+            "draft": len([c for c in COUNTRIES_DATA if c['status'] == 'draft']),
+            "under_development": len([c for c in COUNTRIES_DATA if c['status'] == 'under_development'])
+        },
+        "regional_insights": {
+            "total_countries": len(COUNTRIES_DATA),
+            "coverage_percentage": 75.0,
+            "top_themes": THEMES_DATA[:5]
+        }
+    })
+
 @app.route('/network')
 def network():
     """Network visualization page"""
     return render_template('network.html')
+
+@app.route('/api/network')
+def api_network():
+    """API endpoint for network visualization data"""
+    nodes = []
+    links = []
+    
+    # Add country nodes
+    for country in COUNTRIES_DATA:
+        nodes.append({
+            "id": country['code'],
+            "name": country['name'],
+            "type": "country",
+            "status": country['status']
+        })
+    
+    # Add theme nodes
+    for theme in THEMES_DATA:
+        nodes.append({
+            "id": theme['name'],
+            "name": theme['name'],
+            "type": "theme",
+            "frequency": theme['frequency']
+        })
+        
+        # Add links between themes and countries
+        for country_code in theme['countries']:
+            links.append({
+                "source": country_code,
+                "target": theme['name'],
+                "type": "implements"
+            })
+    
+    return jsonify({"nodes": nodes, "links": links})
 
 @app.route('/timeline')
 def timeline():
@@ -233,6 +293,11 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 # For Vercel serverless deployment
+from werkzeug.middleware.proxy_fix import ProxyFix
+
+# Apply ProxyFix middleware for better Vercel compatibility
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
+
 if __name__ == '__main__':
     app.run(debug=True)
 
