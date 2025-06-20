@@ -230,16 +230,10 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 # For Vercel serverless deployment
-def handler(request):
-    """Vercel serverless handler"""
-    if request.method == 'POST':
-        return app(request.environ, start_response)
-    else:
-        return app(request.environ, start_response)
+from werkzeug.middleware.proxy_fix import ProxyFix
 
-def start_response(status, headers):
-    """WSGI start_response function"""
-    return None
+# Apply ProxyFix middleware
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
 
 # Export for Vercel
 app = app

@@ -53,5 +53,11 @@ class TestBasicFunctionality(unittest.TestCase):
         self.assertIn('Priority Sectors', content)
         self.assertIn('Key Initiatives', content)
 
+    def test_vercel_wsgi_setup(self):
+        """Test that Vercel WSGI middleware is properly configured"""
+        self.assertTrue(hasattr(app, 'wsgi_app'))
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        self.assertIsInstance(app.wsgi_app, ProxyFix)
+
 if __name__ == '__main__':
     unittest.main()
