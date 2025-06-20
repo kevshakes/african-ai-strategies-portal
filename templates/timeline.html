@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Timeline - African AI Strategies Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>AI Strategy Timeline
+                </h4>
+            </div>
+            <div class="card-body">
+                <div id="timeline-container" class="timeline-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadTimeline();
+});
+
+async function loadTimeline() {
+    try {
+        const response = await fetch('/api/timeline');
+        const data = await response.json();
+        
+        AIStrategiesPortal.createTimeline('timeline-container', data);
+        
+    } catch (error) {
+        console.error('Error loading timeline:', error);
+        document.getElementById('timeline-container').innerHTML = 
+            '<p class="text-muted text-center">Unable to load timeline visualization</p>';
+    }
+}
+</script>
+{% endblock %}
