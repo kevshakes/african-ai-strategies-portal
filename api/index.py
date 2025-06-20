@@ -4,11 +4,17 @@ African AI Strategies Portal - Vercel Serverless Function
 """
 
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import json
 import os
 from datetime import datetime
+from pathlib import Path
 
-app = Flask(__name__)
+# Initialize Flask app with proper paths for Vercel
+app = Flask(__name__, 
+            template_folder='../templates',
+            static_folder='../static')
+CORS(app)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -227,9 +233,13 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 # For Vercel serverless deployment
-def handler(request):
-    """Vercel serverless handler"""
-    return app(request.environ, lambda status, headers: None)
+if __name__ == '__main__':
+    app.run(debug=True)
 
-# Export for Vercel
-app = app
+# Export the Flask app for Vercel
+# This is the key for Vercel to recognize the app
+def handler(event, context):
+    return app
+
+# Make sure the app is available at module level
+application = app
