@@ -9,12 +9,16 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-import pathlib
 
 # Get absolute paths for better compatibility
-BASE_DIR = pathlib.Path(__file__).parent.parent
-TEMPLATE_DIR = str(BASE_DIR / 'templates')
-STATIC_DIR = str(BASE_DIR / 'static')
+try:
+    BASE_DIR = Path(__file__).parent.parent
+    TEMPLATE_DIR = str(BASE_DIR / 'templates')
+    STATIC_DIR = str(BASE_DIR / 'static')
+except Exception:
+    # Fallback for serverless environment
+    TEMPLATE_DIR = '../templates'
+    STATIC_DIR = '../static'
 
 # Initialize Flask app with proper paths for Vercel
 app = Flask(__name__,
