@@ -5,7 +5,7 @@
       "src": "api/index.py",
       "use": "@vercel/python@3.1.0",
       "config": {
-        "runtime": "python3.11"
+        "runtime": "python3.9"
       }
     }
   ],
@@ -29,7 +29,6 @@
   },
   "env": {
     "FLASK_ENV": "production",
-    "FLASK_APP": "api/index.py",
-    "PYTHONPATH": "/var/task"
+    "FLASK_APP": "api/index.py"
   }
 }

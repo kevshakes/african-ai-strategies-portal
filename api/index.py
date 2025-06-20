@@ -8,17 +8,10 @@ from flask_cors import CORS
 import json
 import os
 from datetime import datetime
-from pathlib import Path
 
-# Get absolute paths for better compatibility
-try:
-    BASE_DIR = Path(__file__).parent.parent
-    TEMPLATE_DIR = str(BASE_DIR / 'templates')
-    STATIC_DIR = str(BASE_DIR / 'static')
-except Exception:
-    # Fallback for serverless environment
-    TEMPLATE_DIR = '../templates'
-    STATIC_DIR = '../static'
+# Simple path setup for Vercel serverless
+TEMPLATE_DIR = '../templates'
+STATIC_DIR = '../static'
 
 # Initialize Flask app with proper paths for Vercel
 app = Flask(__name__,
@@ -297,11 +290,6 @@ def internal_error(error):
     return render_template('500.html'), 500
 
 # For Vercel serverless deployment
-from werkzeug.middleware.proxy_fix import ProxyFix
-
-# Apply ProxyFix middleware for better Vercel compatibility
-app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-
 if __name__ == '__main__':
     app.run(debug=True)
 
