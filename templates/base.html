@@ -13,6 +13,9 @@
     <!-- D3.js for visualizations -->
     <script src="https://d3js.org/d3.v7.min.js"></script>
     
+    <!-- Flask-Moment -->
+    {{ moment.include_moment() }}
+    
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -84,7 +87,7 @@
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0">
                         <i class="fas fa-calendar me-1"></i>
-                        Last Updated: <span id="last-updated">{{ moment().format('YYYY-MM-DD') }}</span>
+                        Last Updated: {{ moment().format('YYYY-MM-DD') }}
                     </p>
                     <p class="mb-0">
                         <i class="fas fa-code me-1"></i>

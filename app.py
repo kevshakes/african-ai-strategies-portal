@@ -6,6 +6,7 @@ Interactive web portal for exploring National AI Strategies across Africa
 
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
+from flask_moment import Moment
 import json
 import os
 from datetime import datetime
@@ -13,6 +14,7 @@ from pathlib import Path
 
 app = Flask(__name__)
 CORS(app)
+moment = Moment(app)
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
@@ -66,63 +68,40 @@ def index():
 @app.route('/country/<country_code>')
 def country_detail(country_code):
     """Individual country strategy page"""
-    # Sample Kenya data for demo
-    if country_code == 'KE':
-        country_data = {
-            "country_code": "KE",
-            "country_name": "Kenya",
-            "strategy_title": "Kenya National Artificial Intelligence Strategy 2022-2027",
-            "publication_date": "2022-03-15",
-            "status": "published",
-            "vision": "To be a globally competitive AI-driven economy that harnesses artificial intelligence for sustainable development",
-            "mission": "To create an enabling environment for AI development, adoption, and innovation that drives economic growth and improves quality of life for all Kenyans",
-            "strategic_pillars": [
-                {
-                    "name": "AI Infrastructure and Ecosystem",
-                    "description": "Develop robust digital infrastructure and supportive ecosystem for AI",
-                    "key_actions": [
-                        "Expand broadband connectivity nationwide",
-                        "Establish AI research centers",
-                        "Create AI innovation hubs",
-                        "Develop data governance frameworks"
-                    ]
-                },
-                {
-                    "name": "Human Capital Development",
-                    "description": "Build AI skills and capabilities across all sectors",
-                    "key_actions": [
-                        "Integrate AI in education curriculum",
-                        "Establish AI training programs",
-                        "Support AI research and development",
-                        "Create AI certification programs"
-                    ]
-                }
-            ],
-            "priority_sectors": [
-                {
-                    "name": "Agriculture",
-                    "ai_applications": ["Precision farming", "Crop monitoring", "Market intelligence"],
-                    "expected_impact": "Increase agricultural productivity by 30%"
-                },
-                {
-                    "name": "Healthcare",
-                    "ai_applications": ["Medical diagnosis", "Drug discovery", "Telemedicine"],
-                    "expected_impact": "Improve healthcare access and quality"
-                }
-            ],
-            "key_initiatives": [
-                {
-                    "name": "Kenya AI Innovation Hub",
-                    "description": "Establish world-class AI research and innovation center",
-                    "budget": "USD 50 million",
-                    "timeline": {"start": "2022", "end": "2025"},
-                    "expected_outcomes": ["100 AI startups incubated", "500 AI researchers trained"]
-                }
-            ],
-            "funding_strategy": {
-                "total_budget": "USD 200 million over 5 years"
+    from src.models import StrategyDatabase
+    
+    # Initialize database
+    db = StrategyDatabase()
+    
+    # Get country strategy data
+    country_data = db.get_country_strategy(country_code.upper())
+    
+    if country_data and country_data['status'] == 'published':
+        # Convert objectives to strategic pillars format for template compatibility
+        strategic_pillars = []
+        if 'objectives' in country_data:
+            strategic_pillars = [{
+                'name': obj,
+                'description': '',  # Could be enhanced with more detailed data
+                'key_actions': []  # Could be populated from initiatives or other data
+            } for obj in country_data['objectives']]
+        country_data['strategic_pillars'] = strategic_pillars
+        
+        # Format priority sectors if they're just strings
+        if country_data['priority_sectors'] and isinstance(country_data['priority_sectors'][0], str):
+            country_data['priority_sectors'] = [{
+                'name': sector,
+                'ai_applications': [],  # Could be enhanced with more detailed data
+                'expected_impact': ''  # Could be enhanced with more detailed data
+            } for sector in country_data['priority_sectors']]
+        
+        # Add funding strategy if not present
+        if 'funding_strategy' not in country_data and 'funding_mechanisms' in country_data:
+            country_data['funding_strategy'] = {
+                'total_budget': next((init['budget'] for init in country_data['key_initiatives'] if 'budget' in init), 'N/A'),
+                'mechanisms': country_data['funding_mechanisms']
             }
-        }
+            
         return render_template('country.html', country=country_data)
     else:
         return render_template('404.html'), 404
