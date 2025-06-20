@@ -8,10 +8,13 @@ import json
 import os
 from datetime import datetime
 
-app = Flask(__name__)
+app = Flask(__name__, 
+                template_folder='../templates',
+                static_folder='../static')
 
 # Configuration
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 # Sample data for demo
 COUNTRIES_DATA = [
@@ -229,7 +232,14 @@ def internal_error(error):
 # For Vercel serverless deployment
 def handler(request):
     """Vercel serverless handler"""
-    return app(request.environ, lambda status, headers: None)
+    if request.method == 'POST':
+        return app(request.environ, start_response)
+    else:
+        return app(request.environ, start_response)
+
+def start_response(status, headers):
+    """WSGI start_response function"""
+    return None
 
 # Export for Vercel
 app = app
