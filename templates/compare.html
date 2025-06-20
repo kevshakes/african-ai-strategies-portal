@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Compare Strategies - African AI Strategies Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-balance-scale me-2"></i>
+                    Compare AI Strategies
+                </h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Select countries to compare their AI strategies side by side. 
+                    Analyze similarities, differences, and collaboration opportunities.
+                </p>
+                
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Select Countries to Compare:</h6>
+                        <div class="row">
+                            {% for country in countries %}
+                            <div class="col-md-4 mb-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" 
+                                           name="countries" value="{{ country.code }}" 
+                                           id="country{{ country.code }}">
+                                    <label class="form-check-label" for="country{{ country.code }}">
+                                        {{ country.name }}
+                                        <span class="badge bg-{{ 'success' if country.status == 'published' else 'warning' }} ms-1">
+                                            {{ country.status }}
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="compareStrategies()">
+                                <i class="fas fa-chart-line me-1"></i>
+                                Compare Selected
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="selectAll()">
+                                <i class="fas fa-check-double me-1"></i>
+                                Select All
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="clearSelection()">
+                                <i class="fas fa-times me-1"></i>
+                                Clear Selection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="comparison-results" class="d-none">
+    <!-- Comparison results will be loaded here -->
+</div>
+
+<div id="loading-container" class="d-none">
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading comparison...</span>
+        </div>
+        <p class="mt-2 text-muted">Analyzing strategies...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function selectAll() {
+    document.querySelectorAll('input[name="countries"]').forEach(cb => cb.checked = true);
+}
+
+function clearSelection() {
+    document.querySelectorAll('input[name="countries"]').forEach(cb => cb.checked = false);
+}
+
+async function compareStrategies() {
+    const selectedCountries = Array.from(document.querySelectorAll('input[name="countries"]:checked'))
+        .map(cb => cb.value);
+    
+    if (selectedCountries.length < 2) {
+        alert('Please select at least 2 countries for comparison');
+        return;
+    }
+    
+    // Show loading
+    document.getElementById('loading-container').classList.remove('d-none');
+    document.getElementById('comparison-results').classList.add('d-none');
+    
+    try {
+        const params = selectedCountries.map(c => `countries=${c}`).join('&');
+        const response = await fetch(`/api/comparison?${params}`);
+        const data = await response.json();
+        
+        displayComparisonResults(data, selectedCountries);
+        
+    } catch (error) {
+        console.error('Comparison error:', error);
+        alert('Failed to load comparison data');
+    } finally {
+        document.getElementById('loading-container').classList.add('d-none');
+    }
+}
+
+function displayComparisonResults(data, countries) {
+    const container = document.getElementById('comparison-results');
+    
+    let html = `
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>
+                            Comparison Results: ${countries.join(', ')}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-check-circle text-success me-2"></i>Similarities</h6>
+                                <ul class="list-unstyled">
+    `;
+    
+    if (data.similarities && Object.keys(data.similarities).length > 0) {
+        for (const [category, items] of Object.entries(data.similarities)) {
+            html += `<li><strong>${category}:</strong> ${items.join(', ')}</li>`;
+        }
+    } else {
+        html += '<li class="text-muted">No major similarities identified</li>';
+    }
+    
+    html += `
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Key Differences</h6>
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Country</th>
+                                                <th>Budget</th>
+                                                <th>Lead Agency</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+    `;
+    
+    if (data.differences) {
+        for (const [country, details] of Object.entries(data.differences)) {
+            html += `
+                <tr>
+                    <td><strong>${country}</strong></td>
+                    <td>${details.budget || 'N/A'}</td>
+                    <td>${details.governance || 'N/A'}</td>
+                </tr>
+            `;
+        }
+    }
+    
+    html += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    if (data.common_themes && data.common_themes.length > 0) {
+        html += `
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-tags me-2"></i>Common Themes
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex flex-wrap gap-2">
+        `;
+        
+        data.common_themes.forEach(theme => {
+            html += `<span class="badge bg-primary">${theme}</span>`;
+        });
+        
+        html += `
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (data.collaboration_opportunities && data.collaboration_opportunities.length > 0) {
+        html += `
+            <div class="row">
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-handshake me-2"></i>Collaboration Opportunities
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+        `;
+        
+        data.collaboration_opportunities.forEach(opportunity => {
+            html += `<li class="list-group-item">${opportunity}</li>`;
+        });
+        
+        html += `
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+    container.classList.remove('d-none');
+}
+</script>
+{% endblock %}

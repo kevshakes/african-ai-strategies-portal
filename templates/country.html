@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block title %}{{ country.country_name }} - African AI Strategies Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Country Header -->
+    <div class="col-12 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="card-title mb-2">
+                            {{ country.country_name }} AI Strategy
+                        </h1>
+                        <p class="card-text lead mb-2">{{ country.strategy_title }}</p>
+                        <div class="d-flex gap-2">
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-calendar me-1"></i>
+                                {{ country.publication_date }}
+                            </span>
+                            <span class="badge bg-{{ 'success' if country.status == 'published' else 'warning' }}">
+                                {{ country.status.title() }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="display-1">🇰🇪</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Vision & Mission -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-eye me-2"></i>Vision & Mission
+                </h5>
+            </div>
+            <div class="card-body">
+                <h6>Vision</h6>
+                <p class="text-muted">{{ country.vision }}</p>
+                
+                {% if country.mission %}
+                <h6>Mission</h6>
+                <p class="text-muted">{{ country.mission }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Key Statistics -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Key Statistics
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-primary">{{ country.priority_sectors|length }}</div>
+                        <small class="text-muted">Priority Sectors</small>
+                    </div>
+                    <div class="col-6 mb-3">
+                        <div class="h4 text-success">{{ country.key_initiatives|length }}</div>
+                        <small class="text-muted">Key Initiatives</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 text-info">{{ country.strategic_pillars|length if country.strategic_pillars else 0 }}</div>
+                        <small class="text-muted">Strategic Pillars</small>
+                    </div>
+                    <div class="col-6">
+                        <div class="h4 text-warning">
+                            {% if country.funding_strategy %}
+                                {{ country.funding_strategy.total_budget }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">Total Budget</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Mind Map Visualization -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-project-diagram me-2"></i>Strategy Mind Map
+                </h5>
+                <button class="btn btn-sm btn-outline-primary" onclick="resetMindMap()">
+                    <i class="fas fa-refresh me-1"></i>Reset View
+                </button>
+            </div>
+            <div class="card-body">
+                <div id="mind-map-container" class="mind-map-container"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Strategic Pillars -->
+    {% if country.strategic_pillars %}
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-columns me-2"></i>Strategic Pillars
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="accordion" id="pillarsAccordion">
+                    {% for pillar in country.strategic_pillars %}
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="pillar{{ loop.index }}">
+                            <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" 
+                                    type="button" data-bs-toggle="collapse" 
+                                    data-bs-target="#collapse{{ loop.index }}">
+                                {{ pillar.name }}
+                            </button>
+                        </h2>
+                        <div id="collapse{{ loop.index }}" 
+                             class="accordion-collapse collapse {% if loop.first %}show{% endif %}" 
+                             data-bs-parent="#pillarsAccordion">
+                            <div class="accordion-body">
+                                <p class="text-muted">{{ pillar.description }}</p>
+                                {% if pillar.key_actions %}
+                                <h6>Key Actions:</h6>
+                                <ul>
+                                    {% for action in pillar.key_actions %}
+                                    <li>{{ action }}</li>
+                                    {% endfor %}
+                                </ul>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Priority Sectors -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-industry me-2"></i>Priority Sectors
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for sector in country.priority_sectors %}
+                <div class="mb-3 p-3 border rounded">
+                    <h6 class="mb-2">
+                        {% if sector.name %}{{ sector.name }}{% else %}{{ sector }}{% endif %}
+                    </h6>
+                    {% if sector.ai_applications %}
+                    <small class="text-muted d-block mb-2">
+                        <strong>Applications:</strong> {{ sector.ai_applications|join(', ') }}
+                    </small>
+                    {% endif %}
+                    {% if sector.expected_impact %}
+                    <small class="text-success">
+                        <i class="fas fa-target me-1"></i>{{ sector.expected_impact }}
+                    </small>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Key Initiatives -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>Key Initiatives
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for initiative in country.key_initiatives %}
+                    <div class="col-lg-4 mb-4">
+                        <div class="card h-100 border-primary">
+                            <div class="card-body">
+                                <h6 class="card-title">{{ initiative.name }}</h6>
+                                <p class="card-text text-muted">{{ initiative.description }}</p>
+                                
+                                <div class="mt-auto">
+                                    {% if initiative.budget %}
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-dollar-sign me-1"></i>
+                                            <strong>Budget:</strong> {{ initiative.budget }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if initiative.timeline %}
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            <strong>Timeline:</strong> 
+                                            {{ initiative.timeline.start }} - {{ initiative.timeline.end }}
+                                        </small>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    {% if initiative.expected_outcomes %}
+                                    <div>
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            <strong>Expected Outcomes:</strong>
+                                        </small>
+                                        <ul class="small mt-1">
+                                            {% for outcome in initiative.expected_outcomes %}
+                                            <li>{{ outcome }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Implementation Timeline -->
+    {% if country.implementation_timeline %}
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>Implementation Timeline
+                </h5>
+            </div>
+            <div class="card-body">
+                {% for phase, details in country.implementation_timeline.items() %}
+                <div class="mb-3">
+                    <h6>{{ phase.title() }}</h6>
+                    {% if details.period %}
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-calendar me-1"></i>{{ details.period }}
+                    </p>
+                    {% endif %}
+                    {% if details.focus %}
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-bullseye me-1"></i>{{ details.focus }}
+                    </p>
+                    {% endif %}
+                    {% if details.key_milestones %}
+                    <ul class="small">
+                        {% for milestone in details.key_milestones %}
+                        <li>{{ milestone }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </div>
+                {% if not loop.last %}<hr>{% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Governance Structure -->
+    {% if country.governance_structure %}
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-sitemap me-2"></i>Governance Structure
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if country.governance_structure.steering_committee %}
+                <div class="mb-3">
+                    <h6>Steering Committee</h6>
+                    <p class="text-muted mb-1">
+                        <strong>Chair:</strong> {{ country.governance_structure.steering_committee.chair }}
+                    </p>
+                    <p class="text-muted">
+                        <strong>Mandate:</strong> {{ country.governance_structure.steering_committee.mandate }}
+                    </p>
+                </div>
+                {% endif %}
+                
+                {% if country.governance_structure.implementation_unit %}
+                <div class="mb-3">
+                    <h6>Implementation Unit</h6>
+                    <p class="text-muted mb-1">
+                        <strong>Host:</strong> {{ country.governance_structure.implementation_unit.host }}
+                    </p>
+                    <p class="text-muted">
+                        <strong>Mandate:</strong> {{ country.governance_structure.implementation_unit.mandate }}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Action Buttons -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('compare') }}?countries={{ country.country_code }}" 
+                       class="btn btn-primary">
+                        <i class="fas fa-balance-scale me-1"></i>Compare with Others
+                    </a>
+                    <button class="btn btn-success" onclick="exportCountryData()">
+                        <i class="fas fa-download me-1"></i>Export Data
+                    </button>
+                    {% if country.document_url %}
+                    <a href="{{ country.document_url }}" target="_blank" class="btn btn-info">
+                        <i class="fas fa-external-link-alt me-1"></i>View Original Document
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadCountryMindMap();
+});
+
+async function loadCountryMindMap() {
+    try {
+        const response = await fetch(`/api/mind-map/{{ country.country_code }}`);
+        const mindMapData = await response.json();
+        
+        if (mindMapData.error) {
+            document.getElementById('mind-map-container').innerHTML = 
+                '<p class="text-muted text-center">Unable to load mind map</p>';
+            return;
+        }
+        
+        AIStrategiesPortal.createMindMap('mind-map-container', mindMapData);
+        
+    } catch (error) {
+        console.error('Error loading mind map:', error);
+        document.getElementById('mind-map-container').innerHTML = 
+            '<p class="text-muted text-center">Unable to load mind map</p>';
+    }
+}
+
+function resetMindMap() {
+    loadCountryMindMap();
+}
+
+function exportCountryData() {
+    const countryData = {{ country|tojson }};
+    const blob = new Blob([JSON.stringify(countryData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `{{ country.country_name }}_AI_Strategy.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+</script>
+{% endblock %}

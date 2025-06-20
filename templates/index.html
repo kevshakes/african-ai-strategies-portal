@@ -1,0 +1,384 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - African AI Strategies Portal{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Header Section -->
+    <div class="col-12 mb-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="card-title mb-2">
+                            <i class="fas fa-globe-africa me-2"></i>
+                            African AI Strategies Portal
+                        </h1>
+                        <p class="card-text lead mb-0">
+                            Explore and analyze National Artificial Intelligence Strategies across Africa. 
+                            Discover cross-cutting themes, compare approaches, and identify collaboration opportunities.
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="display-4">🌍</div>
+                        <h3>{{ stats.total_countries }}</h3>
+                        <p class="mb-0">Countries Tracked</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Statistics Cards -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 border-success">
+            <div class="card-body text-center">
+                <i class="fas fa-file-alt fa-3x text-success mb-3"></i>
+                <h3 class="card-title">{{ stats.total_strategies }}</h3>
+                <p class="card-text">Published Strategies</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 border-info">
+            <div class="card-body text-center">
+                <i class="fas fa-lightbulb fa-3x text-info mb-3"></i>
+                <h3 class="card-title" id="themes-count">Loading...</h3>
+                <p class="card-text">Common Themes</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 border-warning">
+            <div class="card-body text-center">
+                <i class="fas fa-industry fa-3x text-warning mb-3"></i>
+                <h3 class="card-title" id="sectors-count">Loading...</h3>
+                <p class="card-text">Priority Sectors</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 border-danger">
+            <div class="card-body text-center">
+                <i class="fas fa-handshake fa-3x text-danger mb-3"></i>
+                <h3 class="card-title" id="collaboration-count">Loading...</h3>
+                <p class="card-text">Collaboration Opportunities</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Countries Overview -->
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-map me-2"></i>
+                    Countries with AI Strategies
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row" id="countries-grid">
+                    {% for country in countries %}
+                    <div class="col-md-6 col-lg-4 mb-3">
+                        <div class="card country-card h-100" data-country="{{ country.code }}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="card-title mb-0">{{ country.name }}</h6>
+                                    <span class="badge bg-{{ 'success' if country.status == 'published' else 'warning' if country.status == 'draft' else 'secondary' }}">
+                                        {{ country.status.title() }}
+                                    </span>
+                                </div>
+                                <div class="mt-2">
+                                    <a href="{{ url_for('country_detail', country_code=country.code) }}" 
+                                       class="btn btn-sm btn-outline-primary">
+                                        <i class="fas fa-eye me-1"></i>View Strategy
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>
+                    Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('compare') }}" class="btn btn-primary">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        Compare Strategies
+                    </a>
+                    <a href="{{ url_for('analysis') }}" class="btn btn-info">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Cross-Cutting Analysis
+                    </a>
+                    <a href="{{ url_for('network') }}" class="btn btn-success">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        Network Visualization
+                    </a>
+                    <a href="{{ url_for('timeline') }}" class="btn btn-warning">
+                        <i class="fas fa-clock me-2"></i>
+                        Timeline View
+                    </a>
+                </div>
+                
+                <hr>
+                
+                <h6>Featured Insights</h6>
+                <ul class="list-unstyled" id="featured-insights">
+                    <li class="mb-2">
+                        <i class="fas fa-arrow-right text-primary me-2"></i>
+                        <small>Loading insights...</small>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Theme Distribution Chart -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Theme Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="theme-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sector Analysis -->
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Priority Sectors
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="sector-chart" style="height: 300px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Recent Updates -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-clock me-2"></i>
+                    Recent Updates
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline" id="recent-updates">
+                    <div class="text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load dashboard data
+    loadDashboardData();
+    
+    // Load visualizations
+    loadThemeChart();
+    loadSectorChart();
+});
+
+async function loadDashboardData() {
+    try {
+        // Load cross-cutting analysis
+        const response = await fetch('/api/cross-cutting');
+        const data = await response.json();
+        
+        // Update statistics
+        document.getElementById('themes-count').textContent = data.total_themes || 0;
+        document.getElementById('collaboration-count').textContent = 
+            data.collaboration_opportunities ? data.collaboration_opportunities.length : 0;
+        
+        // Update insights
+        const insightsContainer = document.getElementById('featured-insights');
+        if (data.insights && data.insights.length > 0) {
+            insightsContainer.innerHTML = data.insights.slice(0, 3).map(insight => 
+                `<li class="mb-2">
+                    <i class="fas fa-arrow-right text-primary me-2"></i>
+                    <small>${insight}</small>
+                </li>`
+            ).join('');
+        }
+        
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+    }
+}
+
+async function loadThemeChart() {
+    try {
+        const response = await fetch('/api/themes');
+        const themes = await response.json();
+        
+        // Create simple bar chart with D3
+        const container = d3.select('#theme-chart');
+        const width = container.node().getBoundingClientRect().width;
+        const height = 300;
+        const margin = {top: 20, right: 30, bottom: 40, left: 40};
+        
+        const svg = container.append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+        
+        const g = svg.append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+        // Use top 8 themes
+        const topThemes = themes.slice(0, 8);
+        
+        const x = d3.scaleBand()
+            .domain(topThemes.map(d => d.name))
+            .range([0, chartWidth])
+            .padding(0.1);
+        
+        const y = d3.scaleLinear()
+            .domain([0, d3.max(topThemes, d => d.frequency)])
+            .range([chartHeight, 0]);
+        
+        // Add bars
+        g.selectAll('.bar')
+            .data(topThemes)
+            .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', d => x(d.name))
+            .attr('width', x.bandwidth())
+            .attr('y', d => y(d.frequency))
+            .attr('height', d => chartHeight - y(d.frequency))
+            .attr('fill', '#0d6efd');
+        
+        // Add axes
+        g.append('g')
+            .attr('transform', `translate(0,${chartHeight})`)
+            .call(d3.axisBottom(x))
+            .selectAll('text')
+            .style('text-anchor', 'end')
+            .attr('dx', '-.8em')
+            .attr('dy', '.15em')
+            .attr('transform', 'rotate(-45)');
+        
+        g.append('g')
+            .call(d3.axisLeft(y));
+            
+    } catch (error) {
+        console.error('Error loading theme chart:', error);
+        document.getElementById('theme-chart').innerHTML = 
+            '<p class="text-muted text-center">Unable to load theme chart</p>';
+    }
+}
+
+async function loadSectorChart() {
+    try {
+        const response = await fetch('/api/cross-cutting');
+        const data = await response.json();
+        
+        // Extract sector information from theme analysis
+        const sectorThemes = Object.entries(data.theme_analysis || {})
+            .filter(([theme, info]) => 
+                ['Agriculture', 'Healthcare', 'Education', 'Financial Services', 
+                 'Manufacturing', 'Energy', 'Transportation'].includes(theme)
+            )
+            .map(([theme, info]) => ({
+                name: theme,
+                frequency: info.frequency
+            }))
+            .sort((a, b) => b.frequency - a.frequency);
+        
+        document.getElementById('sectors-count').textContent = sectorThemes.length;
+        
+        // Create simple horizontal bar chart
+        const container = d3.select('#sector-chart');
+        const width = container.node().getBoundingClientRect().width;
+        const height = 300;
+        const margin = {top: 20, right: 30, bottom: 40, left: 100};
+        
+        const svg = container.append('svg')
+            .attr('width', width)
+            .attr('height', height);
+        
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+        
+        const g = svg.append('g')
+            .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+        const x = d3.scaleLinear()
+            .domain([0, d3.max(sectorThemes, d => d.frequency)])
+            .range([0, chartWidth]);
+        
+        const y = d3.scaleBand()
+            .domain(sectorThemes.map(d => d.name))
+            .range([0, chartHeight])
+            .padding(0.1);
+        
+        // Add bars
+        g.selectAll('.bar')
+            .data(sectorThemes)
+            .enter().append('rect')
+            .attr('class', 'bar')
+            .attr('x', 0)
+            .attr('y', d => y(d.name))
+            .attr('width', d => x(d.frequency))
+            .attr('height', y.bandwidth())
+            .attr('fill', '#198754');
+        
+        // Add axes
+        g.append('g')
+            .attr('transform', `translate(0,${chartHeight})`)
+            .call(d3.axisBottom(x));
+        
+        g.append('g')
+            .call(d3.axisLeft(y));
+            
+    } catch (error) {
+        console.error('Error loading sector chart:', error);
+        document.getElementById('sector-chart').innerHTML = 
+            '<p class="text-muted text-center">Unable to load sector chart</p>';
+    }
+}
+</script>
+{% endblock %}

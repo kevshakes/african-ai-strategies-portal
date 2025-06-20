@@ -1,0 +1,42 @@
+[
+  {
+    "code": "KE",
+    "name": "Kenya",
+    "status": "published"
+  },
+  {
+    "code": "NG",
+    "name": "Nigeria",
+    "status": "published"
+  },
+  {
+    "code": "ZA",
+    "name": "South Africa",
+    "status": "published"
+  },
+  {
+    "code": "EG",
+    "name": "Egypt",
+    "status": "published"
+  },
+  {
+    "code": "MA",
+    "name": "Morocco",
+    "status": "draft"
+  },
+  {
+    "code": "GH",
+    "name": "Ghana",
+    "status": "draft"
+  },
+  {
+    "code": "RW",
+    "name": "Rwanda",
+    "status": "published"
+  },
+  {
+    "code": "TN",
+    "name": "Tunisia",
+    "status": "under_development"
+  }
+]

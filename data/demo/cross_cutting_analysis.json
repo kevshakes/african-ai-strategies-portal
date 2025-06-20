@@ -1,0 +1,169 @@
+{
+  "analysis_date": "2025-06-20T13:24:04.173400",
+  "countries_analyzed": [
+    "KE",
+    "NG",
+    "ZA",
+    "EG",
+    "MA",
+    "GH",
+    "RW",
+    "TN"
+  ],
+  "total_themes": 8,
+  "theme_analysis": {
+    "Skills Development": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "EG",
+        "MA",
+        "GH",
+        "RW",
+        "TN"
+      ],
+      "frequency": 8,
+      "percentage": 100.0,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Innovation": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "EG",
+        "MA",
+        "GH",
+        "RW"
+      ],
+      "frequency": 7,
+      "percentage": 87.5,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Infrastructure": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "EG",
+        "RW",
+        "TN"
+      ],
+      "frequency": 6,
+      "percentage": 75.0,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Agriculture": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "MA",
+        "GH",
+        "RW"
+      ],
+      "frequency": 6,
+      "percentage": 75.0,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Healthcare": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "EG",
+        "RW"
+      ],
+      "frequency": 5,
+      "percentage": 62.5,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Education": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "GH",
+        "TN"
+      ],
+      "frequency": 5,
+      "percentage": 62.5,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Ethics": {
+      "countries": [
+        "KE",
+        "ZA",
+        "EG",
+        "MA"
+      ],
+      "frequency": 4,
+      "percentage": 50.0,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    },
+    "Financial Services": {
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "RW"
+      ],
+      "frequency": 4,
+      "percentage": 50.0,
+      "related_themes": [],
+      "key_initiatives": [],
+      "common_approaches": []
+    }
+  },
+  "insights": [
+    "Skills Development is the most universal theme across all African AI strategies",
+    "Innovation and Infrastructure are prioritized by 75%+ of countries",
+    "Agriculture remains a key focus area for most African nations",
+    "Ethics and governance frameworks are emerging priorities"
+  ],
+  "collaboration_opportunities": [
+    {
+      "theme": "Skills Development",
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "EG",
+        "MA",
+        "GH",
+        "RW",
+        "TN"
+      ],
+      "collaboration_type": "Joint training programs and certification",
+      "potential_impact": "High"
+    },
+    {
+      "theme": "Agriculture",
+      "countries": [
+        "KE",
+        "NG",
+        "ZA",
+        "MA",
+        "GH",
+        "RW"
+      ],
+      "collaboration_type": "Knowledge sharing and technology transfer",
+      "potential_impact": "High"
+    }
+  ]
+}

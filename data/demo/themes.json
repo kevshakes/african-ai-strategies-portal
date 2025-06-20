@@ -1,0 +1,103 @@
+[
+  {
+    "name": "Skills Development",
+    "frequency": 8,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "EG",
+      "MA",
+      "GH",
+      "RW",
+      "TN"
+    ],
+    "percentage": 100.0
+  },
+  {
+    "name": "Innovation",
+    "frequency": 7,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "EG",
+      "MA",
+      "GH",
+      "RW"
+    ],
+    "percentage": 87.5
+  },
+  {
+    "name": "Infrastructure",
+    "frequency": 6,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "EG",
+      "RW",
+      "TN"
+    ],
+    "percentage": 75.0
+  },
+  {
+    "name": "Agriculture",
+    "frequency": 6,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "MA",
+      "GH",
+      "RW"
+    ],
+    "percentage": 75.0
+  },
+  {
+    "name": "Healthcare",
+    "frequency": 5,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "EG",
+      "RW"
+    ],
+    "percentage": 62.5
+  },
+  {
+    "name": "Education",
+    "frequency": 5,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "GH",
+      "TN"
+    ],
+    "percentage": 62.5
+  },
+  {
+    "name": "Ethics",
+    "frequency": 4,
+    "countries": [
+      "KE",
+      "ZA",
+      "EG",
+      "MA"
+    ],
+    "percentage": 50.0
+  },
+  {
+    "name": "Financial Services",
+    "frequency": 4,
+    "countries": [
+      "KE",
+      "NG",
+      "ZA",
+      "RW"
+    ],
+    "percentage": 50.0
+  }
+]
